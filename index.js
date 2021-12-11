@@ -35,14 +35,33 @@ const getWalletBalance = async () => {
 }
 
 
-const airDropSol = async () => {
+const airDropSol = async (keypair) => {
     try{
         const connection = new Connection(clusterApiUrl(network), "confirmed");
         const walletKeyPair = await Keypair.fromSecretKey(secretKey);
 
         console.log(`-- Airdropping 5 SOL -- `)
 
-        const fromAirDropSignature = await connection.requestAirdrop(
+        const fromAirDropSignature = connection.requestAirdrop(
+            new PublicKey(walletKeyPair.publicKey),
+            5 * LAMPORTS_PER_SOL
+        );
+        
+        await connection.confirmTransaction(fromAirDropSignature)
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+const externalAirDropSol = async (keypair) => {
+    try{
+        const connection = new Connection(clusterApiUrl(network), "confirmed");
+        const walletKeyPair = await Keypair.fromSecretKey(keypair.secretKey);
+
+        console.log(`-- Airdropping 5 SOL -- `)
+
+        const fromAirDropSignature = connection.requestAirdrop(
             new PublicKey(walletKeyPair.publicKey),
             5 * LAMPORTS_PER_SOL
         );
